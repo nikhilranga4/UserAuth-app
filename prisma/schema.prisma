@@ -1,0 +1,49 @@
+// Prisma schema configuration for SQLite database
+
+// This is the datasource configuration for your database
+datasource db {
+  provider = "sqlite" // Using SQLite as the database provider
+  url      = "file:/Users/nikhil/Desktop/Simplify-tech/User-app/prisma/dev.db" // The SQLite database will be stored in the 'dev.db' file in the prisma directory
+}
+
+// The generator config for Prisma Client
+generator client {
+  provider = "prisma-client-js" // This is used to generate the Prisma Client
+}
+
+// User model with fields like email, password, and personal details
+model User {
+  id           String    @id @default(cuid()) // Unique identifier for each user
+  email        String    @unique // Email field (unique per user)
+  password     String // Password for authentication
+  fullName     String? // User's full name (optional)
+  fbLink       String? // User's Facebook profile link (optional)
+  linkedinLink String? // User's LinkedIn profile link (optional)
+  gender       String? // Gender (optional)
+  dob          DateTime? // Date of birth (optional)
+  createdAt    DateTime  @default(now()) // Timestamp when user is created
+  updatedAt    DateTime  @updatedAt // Timestamp when user data is updated
+  Account      Account[]
+  Session      Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  providerType      String
+  providerId        String
+  providerAccountId String  @unique
+  access_token      String?
+  refresh_token     String?
+  expires_at        Int?
+  user              User    @relation(fields: [userId], references: [id]) // This is the original relation
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  expires      DateTime
+  sessionToken String   @unique
+  accessToken  String?
+  user         User     @relation(fields: [userId], references: [id])
+}
